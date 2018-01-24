@@ -1,0 +1,33 @@
+name: mwifiex correctly handling kzalloc
+originator: 
+  name: APISan
+  note: By the time this is fixed it lives under drivers/net/wireless/marvell/mwifiex/sdio.c
+  details: https://github.com/sslab-gatech/apisan/blob/master/bugs/linux/0001-mwifiex-correctly-handling-kzalloc.patch
+source:
+  name: Linux
+  fixed_at: 50f85e220f6f51798429a3cc74e7c76d27513bef
+  exists_at: fd7cd061adcf5f7503515ba52b6a724642a839c8
+location:
+  link: https://github.com/torvalds/linux/blob/fd7cd061adcf5f7503515ba52b6a724642a839c8/drivers/net/wireless/mwifiex/sdio.c#L2051
+  line: 2051
+  procedure: mwifiex_init_sdio
+methods:
+  - kzalloc
+ingest:
+  - run: 
+      - ./tools/shapeshifter/toolsFor26/spec2image 
+      - --entrypoint=./misc/entrypoint.sh 
+      - -t 
+      - madpl 
+      - -l 
+      - madpl
+      - ./image-specs/linux/v4.5-rc4/drivers/net/wireless/mwifiex.env
+    start: Building docker image... 
+    end: Image built!
+  - run:
+      - ./tools/shapeshifter/ingest 
+      - madpl/mwifiex
+      - $PWD/.temp
+      - fd7cd061adcf5f7503515ba52b6a724642a839c8
+    start: Compiling in docker container (and generating transformed sources)...
+    end: Source generated!

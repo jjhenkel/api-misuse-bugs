@@ -1,0 +1,32 @@
+name: acpi missing check on kobject_create_and_add 
+originator: 
+  name: APISan
+  details: https://github.com/sslab-gatech/apisan/blob/master/bugs/linux/0001-acpi-correctly-check-failed-allocation.patch 
+source:
+  name: Linux 
+  fixed_at: bc1e49df345cf9be38ba29ead45a12f86ceb5fe2
+  exists_at: fd7cd061adcf5f7503515ba52b6a724642a839c8 
+location:
+  link: https://github.com/torvalds/linux/blob/fd7cd061adcf5f7503515ba52b6a724642a839c8/drivers/acpi/sysfs.c#L880
+  line: 880
+  procedure: acpi_sysfs_init
+methods:
+  - kobject_create_and_add
+ingest:
+  - run: 
+      - ./tools/shapeshifter/toolsFor26/spec2image 
+      - --entrypoint=./misc/entrypoint.sh 
+      - -t 
+      - madpl 
+      - -l 
+      - madpl
+      - ./image-specs/linux/v4.5-rc4/drivers/acpi.env
+    start: Building docker image... 
+    end: Image built!
+  - run:
+      - ./tools/shapeshifter/ingest 
+      - madpl/acpi
+      - $PWD/.temp
+      - fd7cd061adcf5f7503515ba52b6a724642a839c8
+    start: Compiling in docker container (and generating transformed sources)...
+    end: Source generated!

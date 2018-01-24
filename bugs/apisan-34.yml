@@ -1,0 +1,33 @@
+name: pvrusb2 correctly handling failed thread run
+originator: 
+  name: APISan
+  details: https://github.com/sslab-gatech/apisan/blob/master/bugs/linux/0001-pvrusb2-correctly-handling-failed-thread-run.patch
+source:
+  name: Linux
+  fixed_at: bb07df8ae18b42a8c5aea715fae82938b467ff9d
+  exists_at: fd7cd061adcf5f7503515ba52b6a724642a839c8
+location:
+  link: https://github.com/torvalds/linux/blob/fd7cd061adcf5f7503515ba52b6a724642a839c8/drivers/media/usb/pvrusb2/pvrusb2-context.c#L199
+  line: 199
+  procedure: pvr2_context_global_init
+methods:
+  - kthread_run
+  - IS_ERR
+ingest:
+  - run: 
+      - ./tools/shapeshifter/toolsFor26/spec2image 
+      - --entrypoint=./misc/entrypoint.sh 
+      - -t 
+      - madpl 
+      - -l 
+      - madpl
+      - ./image-specs/linux/v4.5-rc4/drivers/media/usb/pvrusb2.env
+    start: Building docker image... 
+    end: Image built!
+  - run:
+      - ./tools/shapeshifter/ingest 
+      - madpl/pvrusb2
+      - $PWD/.temp
+      - fd7cd061adcf5f7503515ba52b6a724642a839c8
+    start: Compiling in docker container (and generating transformed sources)...
+    end: Source generated!

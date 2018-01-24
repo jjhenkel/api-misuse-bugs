@@ -1,0 +1,36 @@
+name: plugin a lock leak in simple_xattr_list
+originator: 
+  name: https://github.com/mjguzik
+  notes: >
+    Just one of many commits with 'fix' in the title that are fairly easy to
+    translate into bugs for this testsuite.
+  details: https://github.com/torvalds/linux/commit/0e9a7da51b028aee7a72c95096c99fe5ea2a01f0
+source:
+  name: Linux
+  fixed_at: e8c61ecc1b1658f887e74a5be2cb9f9b79baa325
+  exists_at: 786534b92f3ce68f4afc8a761c80b76887797b0a
+location:
+  link: https://github.com/torvalds/linux/blob/786534b92f3ce68f4afc8a761c80b76887797b0a/fs/xattr.c#L972
+  line: 972
+  procedure: simple_xattr_list
+methods:
+  - spin_lock
+  - spin_unlock
+ingest:
+  - run: 
+      - ./tools/shapeshifter/toolsFor26/spec2image 
+      - --entrypoint=./misc/entrypoint.sh 
+      - -t 
+      - madpl 
+      - -l 
+      - madpl
+      - ./image-specs/linux/v4.5-rc4/fs.env
+    start: Building docker image... 
+    end: Image built!
+  - run:
+      - ./tools/shapeshifter/ingest 
+      - madpl/fs
+      - $PWD/.temp
+      - 786534b92f3ce68f4afc8a761c80b76887797b0a
+    start: Compiling in docker container (and generating transformed sources)...
+    end: Source generated!

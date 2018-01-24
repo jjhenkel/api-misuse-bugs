@@ -1,0 +1,32 @@
+name: m5602 correctly check failed thread creation
+originator: 
+  name: APISan
+  details: https://github.com/sslab-gatech/apisan/blob/master/bugs/linux/0001-m5602-correctly-check-failed-thread-creation.patch
+source:
+  name: Linux
+  fixed_at: 175f8d6746aa4b1dac5ccf576bcbc5488ff21a36
+  exists_at: fd7cd061adcf5f7503515ba52b6a724642a839c8
+location:
+  link: https://github.com/torvalds/linux/blob/fd7cd061adcf5f7503515ba52b6a724642a839c8/drivers/net/ethernet/mellanox/mlx4/mr.c#L321
+  line: 321
+  procedure: mlx4_mr_hw_get_mpt
+methods:
+  - mlx4_alloc_cmd_mailbox
+ingest:
+  - run: 
+      - ./tools/shapeshifter/toolsFor26/spec2image 
+      - --entrypoint=./misc/entrypoint.sh 
+      - -t 
+      - madpl 
+      - -l 
+      - madpl
+      - ./image-specs/linux/v4.5-rc4/drivers/net/ethernet/mellanox/mlx4.env
+    start: Building docker image... 
+    end: Image built!
+  - run:
+      - ./tools/shapeshifter/ingest 
+      - madpl/mlx4
+      - $PWD/.temp
+      - fd7cd061adcf5f7503515ba52b6a724642a839c8
+    start: Compiling in docker container (and generating transformed sources)...
+    end: Source generated!

@@ -1,0 +1,24 @@
+name: Linux ALL (allyesconfig)
+originator: 
+  name: This is just a 'aggregate' bug that ingests the sources for all of the APISan linux bugs
+source:
+  name: Linux 
+  exists_at: fd7cd061adcf5f7503515ba52b6a724642a839c8 
+ingest:
+  - run: 
+      - ./tools/shapeshifter/toolsFor26/spec2image 
+      - --entrypoint=./misc/entrypoint.sh 
+      - -t 
+      - madpl 
+      - -l 
+      - madpl
+      - ./image-specs/linux/v4.5-rc4/allyes.env
+    start: Building docker image... 
+    end: Image built!
+  - run:
+      - ./tools/shapeshifter/ingest 
+      - madpl/allyes
+      - $PWD/.temp
+      - fd7cd061adcf5f7503515ba52b6a724642a839c8
+    start: Compiling in docker container (and generating transformed sources)...
+    end: Source generated!

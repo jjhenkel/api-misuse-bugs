@@ -1,0 +1,32 @@
+name: ch7006 correctly handling failed allocation
+originator: 
+  name: APISan
+  details: https://github.com/sslab-gatech/apisan/blob/master/bugs/linux/0001-ch7006-correctly-handling-failed-allocation.patch
+source:
+  name: Linux 
+  fixed_at:
+  exists_at: fd7cd061adcf5f7503515ba52b6a724642a839c8 
+location:
+  link: https://github.com/torvalds/linux/blob/fd7cd061adcf5f7503515ba52b6a724642a839c8/drivers/gpu/drm/i2c/ch7006_drv.c#L255
+  line: 255
+  procedure: ch7006_encoder_create_resources
+methods:
+  - drm_property_create_range
+ingest:
+  - run: 
+      - ./tools/shapeshifter/toolsFor26/spec2image 
+      - --entrypoint=./misc/entrypoint.sh 
+      - -t 
+      - madpl 
+      - -l 
+      - madpl
+      - ./image-specs/linux/v4.5-rc4/drivers/gpu/drm/i2c.env
+    start: Building docker image... 
+    end: Image built!
+  - run:
+      - ./tools/shapeshifter/ingest 
+      - madpl/i2c
+      - $PWD/.temp
+      - fd7cd061adcf5f7503515ba52b6a724642a839c8
+    start: Compiling in docker container (and generating transformed sources)...
+    end: Source generated!

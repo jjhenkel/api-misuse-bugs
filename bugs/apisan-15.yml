@@ -1,0 +1,32 @@
+name: emu10k1 correctly handling failed thread creation
+originator: 
+  name: APISan
+  details: https://github.com/sslab-gatech/apisan/blob/master/bugs/linux/0001-emu10k1-correctly-handling-failed-thread-creation.patch
+source:
+  name: Linux
+  fixed_at: f1d51595a2a54d725cd6a21dd54508335a14ab90
+  exists_at: fd7cd061adcf5f7503515ba52b6a724642a839c8
+location:
+  link: https://github.com/torvalds/linux/blob/fd7cd061adcf5f7503515ba52b6a724642a839c8/sound/pci/emu10k1/emu10k1_main.c#L1141
+  line: 1141
+  procedure: snd_emu10k1_emu1010_init
+methods:
+  - kthread_create
+ingest:
+  - run: 
+      - ./tools/shapeshifter/toolsFor26/spec2image 
+      - --entrypoint=./misc/entrypoint.sh 
+      - -t 
+      - madpl 
+      - -l 
+      - madpl
+      - ./image-specs/linux/v4.5-rc4/sound/pci/emu10k1.env
+    start: Building docker image... 
+    end: Image built!
+  - run:
+      - ./tools/shapeshifter/ingest 
+      - madpl/emu10k1
+      - $PWD/.temp
+      - fd7cd061adcf5f7503515ba52b6a724642a839c8
+    start: Compiling in docker container (and generating transformed sources)...
+    end: Source generated!

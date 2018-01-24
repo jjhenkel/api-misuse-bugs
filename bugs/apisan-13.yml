@@ -1,0 +1,32 @@
+name: drbd correctly handling failed crypto_alloc_hash
+originator: 
+  name: APISan
+  details: https://github.com/sslab-gatech/apisan/blob/master/bugs/linux/0001-drbd-correctly-handling-failed-crypto_alloc_hash.patch
+source:
+  name: Linux
+  fixed_at: 
+  exists_at: fd7cd061adcf5f7503515ba52b6a724642a839c8
+location:
+  link: https://github.com/torvalds/linux/blob/fd7cd061adcf5f7503515ba52b6a724642a839c8/drivers/block/drbd/drbd_receiver.c#L3379
+  line: 3379
+  procedure: receive_protocol
+methods:
+  - crypto_alloc_hash
+ingest:
+  - run: 
+      - ./tools/shapeshifter/toolsFor26/spec2image 
+      - --entrypoint=./misc/entrypoint.sh 
+      - -t 
+      - madpl 
+      - -l 
+      - madpl
+      - ./image-specs/linux/v4.5-rc4/drivers/block/drbd.env
+    start: Building docker image... 
+    end: Image built!
+  - run:
+      - ./tools/shapeshifter/ingest 
+      - madpl/drbd
+      - $PWD/.temp
+      - fd7cd061adcf5f7503515ba52b6a724642a839c8
+    start: Compiling in docker container (and generating transformed sources)...
+    end: Source generated!

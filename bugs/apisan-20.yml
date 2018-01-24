@@ -1,0 +1,33 @@
+name: gma500 handling failed allocation
+originator: 
+  name: APISan
+  notes: The 'fix' ends up being to ignore failure of this call... so really this isn't a true bug?
+  details: https://github.com/sslab-gatech/apisan/blob/master/bugs/linux/0001-gma500-handling-failed-allocation.patch
+source:
+  name: Linux
+  fixed_at: 13619ce570ee57bb509394b896b21eba41fa4392
+  exists_at: fd7cd061adcf5f7503515ba52b6a724642a839c8
+location:
+  link: https://github.com/torvalds/linux/blob/fd7cd061adcf5f7503515ba52b6a724642a839c8/drivers/gpu/drm/gma500/framebuffer.c#L687
+  line: 687
+  procedure: psb_create_backlight_property
+methods:
+  - drm_property_create_range
+ingest:
+  - run: 
+      - ./tools/shapeshifter/toolsFor26/spec2image 
+      - --entrypoint=./misc/entrypoint.sh 
+      - -t 
+      - madpl 
+      - -l 
+      - madpl
+      - ./image-specs/linux/v4.5-rc4/drivers/gpu/drm/gma500.env
+    start: Building docker image... 
+    end: Image built!
+  - run:
+      - ./tools/shapeshifter/ingest 
+      - madpl/gma500
+      - $PWD/.temp
+      - fd7cd061adcf5f7503515ba52b6a724642a839c8
+    start: Compiling in docker container (and generating transformed sources)...
+    end: Source generated!

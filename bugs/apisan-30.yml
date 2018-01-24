@@ -1,0 +1,32 @@
+name: mtd fixing memory leak and handling failed kmalloc
+originator: 
+  name: APISan
+  details: https://github.com/sslab-gatech/apisan/blob/master/bugs/linux/0001-mtd-fixing-memory-leak-and-handling-failed-kmalloc.patch
+source:
+  name: Linux
+  fixed_at: 33853ebd746f0e6aa262745376fde5d4995e0a87
+  exists_at: fd7cd061adcf5f7503515ba52b6a724642a839c8
+location:
+  link: https://github.com/torvalds/linux/blob/fd7cd061adcf5f7503515ba52b6a724642a839c8/drivers/mtd/chips/cfi_cmdset_0001.c#L616
+  line: 616
+  procedure: cfi_intelext_setup
+methods:
+  - kmalloc
+ingest:
+  - run: 
+      - ./tools/shapeshifter/toolsFor26/spec2image 
+      - --entrypoint=./misc/entrypoint.sh 
+      - -t 
+      - madpl 
+      - -l 
+      - madpl
+      - ./image-specs/linux/v4.5-rc4/drivers/mtd/chips.env
+    start: Building docker image... 
+    end: Image built!
+  - run:
+      - ./tools/shapeshifter/ingest 
+      - madpl/chips
+      - $PWD/.temp
+      - fd7cd061adcf5f7503515ba52b6a724642a839c8
+    start: Compiling in docker container (and generating transformed sources)...
+    end: Source generated!

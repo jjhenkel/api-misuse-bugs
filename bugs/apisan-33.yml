@@ -1,0 +1,34 @@
+name: nes handling failed allocation when creating workqueue
+originator: 
+  name: APISan
+  notes: At master create_singlethread_workqueue is now alloc_ordered_workqueue
+  details: https://github.com/sslab-gatech/apisan/blob/master/bugs/linux/0001-nes-handling-failed-allocation-when-creating-workque.patch
+source:
+  name: Linux
+  fixed_at: a82268b30a8b4b920d0bad24472cbb000c8e734a
+  exists_at: fd7cd061adcf5f7503515ba52b6a724642a839c8
+location:
+  link: https://github.com/torvalds/linux/blob/fd7cd061adcf5f7503515ba52b6a724642a839c8/drivers/infiniband/hw/nes/nes_cm.c#L2858
+  line: 2858
+  procedure: nes_cm_alloc_core
+methods:
+  - create_singlethread_workqueue
+  - destroy_workqueue
+ingest:
+  - run: 
+      - ./tools/shapeshifter/toolsFor26/spec2image 
+      - --entrypoint=./misc/entrypoint.sh 
+      - -t 
+      - madpl 
+      - -l 
+      - madpl
+      - ./image-specs/linux/v4.5-rc4/drivers/infiniband/hw/nes.env
+    start: Building docker image... 
+    end: Image built!
+  - run:
+      - ./tools/shapeshifter/ingest 
+      - madpl/nes
+      - $PWD/.temp
+      - fd7cd061adcf5f7503515ba52b6a724642a839c8
+    start: Compiling in docker container (and generating transformed sources)...
+    end: Source generated!

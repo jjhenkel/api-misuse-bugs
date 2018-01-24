@@ -1,0 +1,32 @@
+name: aoe remove unnecessary check for failing kthread creation 
+originator: 
+  name: APISan
+  details: https://github.com/sslab-gatech/apisan/blob/master/bugs/linux/0001-aoe-remove-unnecessary-check-for-failing-kthread-cre.patch
+source:
+  name: Linux 
+  fixed_at: 
+  exists_at: fd7cd061adcf5f7503515ba52b6a724642a839c8 
+location:
+  link: https://github.com/torvalds/linux/blob/fd7cd061adcf5f7503515ba52b6a724642a839c8/drivers/block/aoe/aoecmd.c#L1330
+  line: 1330
+  procedure: aoe_ktstart
+methods:
+  - kthread_run
+ingest:
+  - run: 
+      - ./tools/shapeshifter/toolsFor26/spec2image 
+      - --entrypoint=./misc/entrypoint.sh 
+      - -t 
+      - madpl 
+      - -l 
+      - madpl
+      - ./image-specs/linux/v4.5-rc4/drivers/block/aoe.env
+    start: Building docker image... 
+    end: Image built!
+  - run:
+      - ./tools/shapeshifter/ingest 
+      - madpl/aoe
+      - $PWD/.temp
+      - fd7cd061adcf5f7503515ba52b6a724642a839c8
+    start: Compiling in docker container (and generating transformed sources)...
+    end: Source generated!

@@ -1,0 +1,40 @@
+name: fusion-mptbase handle failed allocation for workqueue
+originator: 
+  name: APISan
+  notes: >
+    This also happened to get found/fixed with the report from APISan on 
+    the missing check on the result of create_singlethread_workqueue. The 
+    difference is that this bug has to do with forgetting a call to iounmap
+    in a (interprocedural) context. We get clued in that it's time to 
+    iounmap because of the call to kfree(ioc)
+  details: https://github.com/sslab-gatech/apisan/blob/master/bugs/linux/0001-fusion-mptbase-handle-failed-allocation-for-workqueu.patch
+source:
+  name: Linux
+  fixed_at: e8c61ecc1b1658f887e74a5be2cb9f9b79baa325
+  exists_at: fd7cd061adcf5f7503515ba52b6a724642a839c8
+location:
+  link: https://github.com/torvalds/linux/blob/fd7cd061adcf5f7503515ba52b6a724642a839c8/drivers/message/fusion/mptbase.c#L1875
+  line: 1875
+  procedure: mpt_attach
+methods:
+  - ioremap
+  - iounmap
+  - kfree
+ingest:
+  - run: 
+      - ./tools/shapeshifter/toolsFor26/spec2image 
+      - --entrypoint=./misc/entrypoint.sh 
+      - -t 
+      - madpl 
+      - -l 
+      - madpl
+      - ./image-specs/linux/v4.5-rc4/drivers/message/fusion.env
+    start: Building docker image... 
+    end: Image built!
+  - run:
+      - ./tools/shapeshifter/ingest 
+      - madpl/fusion
+      - $PWD/.temp
+      - fd7cd061adcf5f7503515ba52b6a724642a839c8
+    start: Compiling in docker container (and generating transformed sources)...
+    end: Source generated!

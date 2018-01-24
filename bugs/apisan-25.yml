@@ -1,0 +1,33 @@
+name: ipr fix out-of-bounds null overwrite
+originator: 
+  name: APISan
+  notes: This one is different, snprintf(P1, SIZE(P1), ...) seems to be the contract
+  details: https://github.com/sslab-gatech/apisan/blob/master/bugs/linux/0001-ipr-fix-out-of-bounds-null-overwrite.patch
+source:
+  name: Linux
+  fixed_at: d63c7dd5bcb9441af0526d370c43a65ca2c980d9
+  exists_at: fd7cd061adcf5f7503515ba52b6a724642a839c8
+location:
+  link: https://github.com/torvalds/linux/blob/fd7cd061adcf5f7503515ba52b6a724642a839c8/drivers/scsi/ipr.c#L4011
+  line: 4011
+  procedure: ipr_store_update_fw
+methods:
+  - snprintf
+ingest:
+  - run: 
+      - ./tools/shapeshifter/toolsFor26/spec2image 
+      - --entrypoint=./misc/entrypoint.sh 
+      - -t 
+      - madpl 
+      - -l 
+      - madpl
+      - ./image-specs/linux/v4.5-rc4/drivers/scsi.env
+    start: Building docker image... 
+    end: Image built!
+  - run:
+      - ./tools/shapeshifter/ingest 
+      - madpl/scsi
+      - $PWD/.temp
+      - fd7cd061adcf5f7503515ba52b6a724642a839c8
+    start: Compiling in docker container (and generating transformed sources)...
+    end: Source generated!

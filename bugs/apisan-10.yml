@@ -1,0 +1,32 @@
+name: cx231xx correctly handling failed allocation
+originator: 
+  name: APISan
+  details: https://github.com/sslab-gatech/apisan/blob/master/bugs/linux/0001-cx231xx-correctly-handling-failed-allocation.patch
+source:
+  name: Linux 
+  fixed_at: f8433226d1b3eb035693724dca786c4445221368
+  exists_at: fd7cd061adcf5f7503515ba52b6a724642a839c8
+location:
+  link: https://github.com/torvalds/linux/blob/fd7cd061adcf5f7503515ba52b6a724642a839c8/drivers/media/usb/cx231xx/cx231xx-417.c#L1384
+  line: 1384
+  procedure: cx231xx_bulk_copy
+methods:
+  - kmalloc
+ingest:
+  - run: 
+      - ./tools/shapeshifter/toolsFor26/spec2image 
+      - --entrypoint=./misc/entrypoint.sh 
+      - -t 
+      - madpl 
+      - -l 
+      - madpl
+      - ./image-specs/linux/v4.5-rc4/drivers/media/usb/cx231xx.env
+    start: Building docker image... 
+    end: Image built!
+  - run:
+      - ./tools/shapeshifter/ingest 
+      - madpl/cx231xx
+      - $PWD/.temp
+      - fd7cd061adcf5f7503515ba52b6a724642a839c8
+    start: Compiling in docker container (and generating transformed sources)...
+    end: Source generated!

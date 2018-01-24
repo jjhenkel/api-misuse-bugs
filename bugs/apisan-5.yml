@@ -1,0 +1,32 @@
+name: ata sata_sx4 correctly handle failed allocation
+originator: 
+  name: APISan
+  details: https://github.com/sslab-gatech/apisan/blob/master/bugs/linux/0001-ata-correctly-handling-failed-allocation.patch
+source:
+  name: Linux 
+  fixed_at: 427cc61a4486fa80eccaad2bdfcc50cfd1b46625
+  exists_at: fd7cd061adcf5f7503515ba52b6a724642a839c8 
+location:
+  link: https://github.com/torvalds/linux/blob/fd7cd061adcf5f7503515ba52b6a724642a839c8/drivers/ata/sata_sx4.c#L1398
+  line: 1398
+  procedure: pdc20621_dimm_init
+methods:
+  - kzalloc
+ingest:
+  - run: 
+      - ./tools/shapeshifter/toolsFor26/spec2image 
+      - --entrypoint=./misc/entrypoint.sh 
+      - -t 
+      - madpl 
+      - -l 
+      - madpl
+      - ./image-specs/linux/v4.5-rc4/drivers/ata.env
+    start: Building docker image... 
+    end: Image built!
+  - run:
+      - ./tools/shapeshifter/ingest 
+      - madpl/ata
+      - $PWD/.temp
+      - fd7cd061adcf5f7503515ba52b6a724642a839c8
+    start: Compiling in docker container (and generating transformed sources)...
+    end: Source generated!
